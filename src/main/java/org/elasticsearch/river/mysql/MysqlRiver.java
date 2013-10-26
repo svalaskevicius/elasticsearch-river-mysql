@@ -316,10 +316,11 @@ public class MysqlRiver extends AbstractRiverComponent implements River {
 				HttpURLConnection connection = null;
 				InputStream is = null;
 				try {
-					logger.info("connected");
+					logger.info("connecting");
 
 					URL url = new URL(mysqlStreamProtocol, mysqlStreamHost, mysqlStreamPort, "/");
 					connection = (HttpURLConnection) url.openConnection();
+					logger.info("connected");
 					connection.setDoInput(true);
 					connection.setUseCaches(false);
 
@@ -340,6 +341,7 @@ public class MysqlRiver extends AbstractRiverComponent implements River {
 					final BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
 
 					String line;
+					logger.info("starting read");
 					while ((line = reader.readLine()) != null) {
 						logger.info("reading");
 						if (closed) {
@@ -358,6 +360,7 @@ public class MysqlRiver extends AbstractRiverComponent implements River {
 						stream.put(line);
 					}
 				} catch (Exception e) {
+					logger.warn("slurping exception", e);
 					Closeables.closeQuietly(is);
 					if (connection != null) {
 						try {
