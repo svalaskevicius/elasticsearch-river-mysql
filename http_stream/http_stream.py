@@ -7,7 +7,7 @@
 from pymysqlreplication import BinLogStreamReader
 from pymysqlreplication.row_event import *
 
-mysql_settings = {'host': '127.0.0.1', 'port': 3306, 'user': 'root', 'passwd': ''}
+mysql_settings = {'host': '127.0.0.1', 'port': 3306, 'user': 'root', 'passwd': 'root'}
 
 import json
 import cherrypy
