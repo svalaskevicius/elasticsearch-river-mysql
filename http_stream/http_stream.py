@@ -11,6 +11,9 @@ mysql_settings = {'host': '127.0.0.1', 'port': 3306, 'user': 'root', 'passwd': '
 
 import json
 import cherrypy
+
+cherrypy.engine.timeout_monitor.unsubscribe()
+
 def default(obj):
     """Default JSON serializer."""
     import calendar, datetime
