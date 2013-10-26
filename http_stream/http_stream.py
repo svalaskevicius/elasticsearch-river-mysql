@@ -40,16 +40,20 @@ class Streamer(object):
                 for row in binlogevent.rows:
                     if isinstance(binlogevent, DeleteRowsEvent):
                         yield json.dumps({
-                          "action": "delete"
-                        }) + "\n"
+                          "action": "delete",
+                          "table": binlogevent.table,
+                          "doc": row["values"]
+			}, default=default) + "\n"
                     elif isinstance(binlogevent, UpdateRowsEvent):
                         yield json.dumps({
                           "action": "update",
+                          "table": binlogevent.table,
                           "doc": row["after_values"]
 			}, default=default) + "\n"
                     elif isinstance(binlogevent, WriteRowsEvent):
                         yield json.dumps({
                           "action": "insert",
+                          "table": binlogevent.table,
                           "doc": row["values"]
 			}, default=default) + "\n"
         return content()
