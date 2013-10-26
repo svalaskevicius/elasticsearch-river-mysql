@@ -11,6 +11,22 @@ mysql_settings = {'host': '127.0.0.1', 'port': 3306, 'user': 'root', 'passwd': '
 
 import json
 import cherrypy
+
+cherrypy.engine.timeout_monitor.unsubscribe()
+
+def default(obj):
+    """Default JSON serializer."""
+    import calendar, datetime
+
+    if isinstance(obj, datetime.datetime):
+        if obj.utcoffset() is not None:
+            obj = obj - obj.utcoffset()
+    millis = int(
+        calendar.timegm(obj.timetuple()) * 1000 +
+        obj.microsecond / 1000
+    )
+    return millis
+
 class Streamer(object):
     def __init__(self):
         self.stream = BinLogStreamReader(connection_settings = mysql_settings,
@@ -24,18 +40,18 @@ class Streamer(object):
                 for row in binlogevent.rows:
                     if isinstance(binlogevent, DeleteRowsEvent):
                         yield json.dumps({
-                          "action": "delete",
-                          "id": row["values"]["id"]}) + "\n"
+                          "action": "delete"
+                        }) + "\n"
                     elif isinstance(binlogevent, UpdateRowsEvent):
                         yield json.dumps({
                           "action": "update",
-                          "id": row["after_values"]["id"],
-                          "doc": row["after_values"]}) + "\n"
+                          "doc": row["after_values"]
+			}, default=default) + "\n"
                     elif isinstance(binlogevent, WriteRowsEvent):
                         yield json.dumps({
                           "action": "insert",
-                          "id": row["values"]["id"],
-                          "doc": row["values"]}) + "\n"
+                          "doc": row["values"]
+			}, default=default) + "\n"
         return content()
 
     index.exposed = True
